@@ -1,0 +1,1 @@
+import{E as e,O as t}from"./index-BPS9er7n.js";var n=t(e(),1),r=`FM Essentials`;function i(e){(0,n.useEffect)(()=>{let t=document.title;return document.title=e?`${e} | ${r}`:r,()=>{document.title=t}},[e])}export{i as t};

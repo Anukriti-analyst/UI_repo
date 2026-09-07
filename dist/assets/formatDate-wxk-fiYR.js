@@ -1,0 +1,1 @@
+function e(e){return e?new Intl.DateTimeFormat(`en-GB`,{day:`numeric`,month:`short`,year:`numeric`}).format(new Date(e)):`—`}function t(e){return e?new Intl.DateTimeFormat(`en-GB`,{day:`numeric`,month:`short`,year:`numeric`,hour:`2-digit`,minute:`2-digit`}).format(new Date(e)):`—`}export{t as n,e as t};

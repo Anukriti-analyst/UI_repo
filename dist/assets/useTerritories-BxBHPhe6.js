@@ -1,0 +1,1 @@
+import{n as e,s as t,t as n}from"./endpoints-fhTe47hr.js";function r(){return t({queryKey:[`territories`],queryFn:async()=>(await e.get(n.territories)).data,staleTime:600*1e3})}export{r as t};
