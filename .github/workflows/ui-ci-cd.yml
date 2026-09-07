@@ -1,0 +1,325 @@
+name: UI CI and Azure Web App CD
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - 'release/**'
+      - main
+    types: [closed]
+  push:
+    tags:
+      - 'release-*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee lint-report.txt
+
+      - name: Upload lint artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report-${{ github.sha }}
+          path: lint-report.txt
+          if-no-files-found: error
+          retention-days: 7
+
+  ci:
+    name: Build production bundle
+    needs: sonarqube
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      needs.sonarqube.result == 'success' &&
+      (github.event_name == 'push' || github.event.pull_request.merged == true)
+    env:
+      VITE_API_BASE_URL: ${{ (github.event_name == 'push' && vars.VITE_UAT_API_BASE_URL) || (github.base_ref == 'main' && vars.VITE_PROD_API_BASE_URL) || (github.base_ref == 'develop' && vars.VITE_DEV_API_BASE_URL) || (startsWith(github.base_ref, 'release/') && vars.VITE_QA_API_BASE_URL) || vars.VITE_API_BASE_URL || 'https://enablr-gch2agdgfme6fedr.centralus-01.azurewebsites.net' }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Assemble deployable package
+        run: |
+          mkdir -p release
+          cp -R dist release/dist
+          cp package.json package-lock.json release/
+          printf 'commit=%s\nref=%s\n' "$GITHUB_SHA" "$GITHUB_REF" > release/build-metadata.txt
+
+      - name: Upload deployable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+          if-no-files-found: error
+          retention-days: 7
+
+  sonarqube:
+    name: SonarQube analysis
+    needs: lint
+    if: needs.lint.result == 'success' && (github.event_name == 'push' || github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || '' }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN || '' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'fme-policy-proposal-intake-manager' }}
+    steps:
+      - name: Check out merge commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Run SonarQube scan
+        if: env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=src
+            -Dsonar.exclusions=dist/**,node_modules/**
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Report missing SonarQube configuration
+        if: env.SONAR_HOST_URL == '' || env.SONAR_TOKEN == ''
+        run: echo "::warning::SonarQube scan skipped because SONAR_HOST_URL or SONAR_TOKEN is not configured."
+
+      - name: Upload SonarQube artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarqube-results-${{ github.sha }}
+          path: .scannerwork/**
+          if-no-files-found: ignore
+          retention-days: 7
+
+  veracode:
+    name: Veracode Pipeline Scan
+    needs: ci
+    if: needs.ci.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
+    env:
+      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID || '' }}
+      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY || '' }}
+    steps:
+      - name: Check out merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Download CI artifact for scanning
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Create Veracode source package
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        run: zip -r veracode-source.zip release
+
+      - name: Run Veracode Pipeline Scan
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+        with:
+          vid: ${{ env.VERACODE_API_ID }}
+          vkey: ${{ env.VERACODE_API_KEY }}
+          file: veracode-source.zip
+          fail_build: true
+
+      - name: Report missing Veracode configuration
+        if: env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == ''
+        run: echo "::warning::Veracode scan skipped because VERACODE_API_ID or VERACODE_API_KEY is not configured."
+
+      - name: Fail Prod when Veracode is not configured
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.base_ref == 'main' &&
+          (env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == '')
+        run: |
+          echo "Veracode credentials are required before Prod deployment."
+          exit 1
+
+      - name: Upload Veracode artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: veracode-results-${{ github.sha }}
+          path: |
+            veracode-source.zip
+            results*.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  deploy-dev:
+    name: Deploy feature branch to Dev
+    needs: [ci, sonarqube, veracode]
+    if: >-
+      always() && needs.ci.result == 'success' && needs.sonarqube.result == 'success' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.base_ref == 'develop' &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: dev
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy Dev package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-qa:
+    name: Deploy release branch to QA
+    needs: [ci, sonarqube, veracode]
+    if: >-
+      always() && needs.ci.result == 'success' && needs.sonarqube.result == 'success' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      startsWith(github.base_ref, 'release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: qa
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy QA package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-uat:
+    name: Deploy release tag to UAT
+    needs: [ci, sonarqube, veracode]
+    if: >-
+      always() && needs.ci.result == 'success' && needs.sonarqube.result == 'success' &&
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/tags/release-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: uat
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy UAT package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-prod:
+    name: Deploy main to Prod
+    needs: [ci, sonarqube, veracode]
+    if: >-
+      needs.ci.result == 'success' && needs.sonarqube.result == 'success' && needs.veracode.result == 'success' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: prod
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy Prod package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
