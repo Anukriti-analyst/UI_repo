@@ -1,0 +1,51 @@
+name: UI Build Template
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  ci:
+    name: Build production bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    env:
+      VITE_API_BASE_URL: ${{ (github.event_name == 'push' && vars.VITE_UAT_API_BASE_URL) || (github.base_ref == 'main' && vars.VITE_PROD_API_BASE_URL) || (github.base_ref == 'develop' && vars.VITE_DEV_API_BASE_URL) || (startsWith(github.base_ref, 'release/') && vars.VITE_QA_API_BASE_URL) || vars.VITE_API_BASE_URL || 'https://enablr-gch2agdgfme6fedr.centralus-01.azurewebsites.net' }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Assemble deployable package
+        run: |
+          mkdir -p release
+          cp -R dist release/dist
+          cp package.json package-lock.json release/
+          printf 'commit=%s\nref=%s\n' "$GITHUB_SHA" "$GITHUB_REF" > release/build-metadata.txt
+
+      - name: Upload deployable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+          if-no-files-found: error
+          retention-days: 7

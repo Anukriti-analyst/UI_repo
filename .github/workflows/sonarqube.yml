@@ -1,0 +1,49 @@
+name: UI SonarQube Template
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  sonarqube:
+    name: SonarQube analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    env:
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || '' }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN || '' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'fme-policy-proposal-intake-manager' }}
+    steps:
+      - name: Check out merge commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Run SonarQube scan
+        if: env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.sources=src
+            -Dsonar.exclusions=dist/**,node_modules/**
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Report missing SonarQube configuration
+        if: env.SONAR_HOST_URL == '' || env.SONAR_TOKEN == ''
+        run: echo "::warning::SonarQube scan skipped because SONAR_HOST_URL or SONAR_TOKEN is not configured."
+
+      - name: Upload SonarQube artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarqube-results-${{ github.sha }}
+          path: .scannerwork/**
+          if-no-files-found: ignore
+          retention-days: 7

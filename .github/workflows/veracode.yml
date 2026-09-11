@@ -1,0 +1,65 @@
+name: UI Veracode Template
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  veracode:
+    name: Veracode Pipeline Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
+    env:
+      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID || '' }}
+      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY || '' }}
+    steps:
+      - name: Check out merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: Download CI artifact for scanning
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Create Veracode source package
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        run: zip -r veracode-source.zip release
+
+      - name: Run Veracode Pipeline Scan
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+        with:
+          vid: ${{ env.VERACODE_API_ID }}
+          vkey: ${{ env.VERACODE_API_KEY }}
+          file: veracode-source.zip
+          fail_build: true
+
+      - name: Report missing Veracode configuration
+        if: env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == ''
+        run: echo "::warning::Veracode scan skipped because VERACODE_API_ID or VERACODE_API_KEY is not configured."
+
+      - name: Fail Prod when Veracode is not configured
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.base_ref == 'main' &&
+          (env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == '')
+        run: |
+          echo "Veracode credentials are required before Prod deployment."
+          exit 1
+
+      - name: Upload Veracode artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: veracode-results-${{ github.sha }}
+          path: |
+            veracode-source.zip
+            results*.json
+          if-no-files-found: ignore
+          retention-days: 7
