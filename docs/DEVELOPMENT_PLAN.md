@@ -1,8 +1,8 @@
-# FM Essentials UI — Development Plan
+# Policy Proposal Intake UI — Development Plan
 
 > **Created:** 2026-05-28  
 > **Purpose:** Phased development plan with checkpoints, prerequisites, and strict guidelines  
-> **Priority:** User-friendliness, responsiveness, minimal design (white + FM blue)
+> **Priority:** User-friendliness, responsiveness, minimal design (white + blue)
 
 ---
 
@@ -26,15 +26,15 @@
 
 ## 1. Color Palette & Design Philosophy
 
-### Minimal Color System (White + FM Blue)
+### Minimal Color System (White + Blue)
 
 | Token | Hex | Usage |
 |-------|-----|-------|
 | **White** | `#FFFFFF` | Page backgrounds, cards, containers |
-| **FM Navy (Primary)** | `#383B54` | Primary buttons, sidebar text, headings, active states |
-| **FM Navy Dark** | `#0D102B` | Hover states, emphasis text |
-| **FM Navy Light** | `#F2F2F5` | Subtle backgrounds, hover highlights, table alternating rows |
-| **FM Blue Accent** | `#0073E6` | Links, info badges, focus rings |
+| **Navy (Primary)** | `#383B54` | Primary buttons, sidebar text, headings, active states |
+| **Navy Dark** | `#0D102B` | Hover states, emphasis text |
+| **Navy Light** | `#F2F2F5` | Subtle backgrounds, hover highlights, table alternating rows |
+| **Blue Accent** | `#0073E6` | Links, info badges, focus rings |
 | **Border Gray** | `#E0E0E5` | Borders, dividers, card outlines |
 | **Text Primary** | `#000000` | Body text |
 | **Text Secondary** | `#666666` | Muted/helper text, timestamps |
@@ -48,10 +48,10 @@
 | Principle | Rule |
 |-----------|------|
 | **Minimal** | White cards on light surface background. No gradients, no shadows heavier than `shadow-sm`. |
-| **Clean typography** | FM Review Web font. Clear hierarchy: page title → section title → body. |
+| **Clean typography** | Clear hierarchy: page title → section title → body. |
 | **Generous whitespace** | `p-6` for page containers, `p-4` for cards, `gap-4` between elements. |
 | **One primary action** | Each page has exactly ONE primary (filled) button. Others are secondary/ghost. |
-| **Blue for interaction** | Links, focus rings, active nav indicators — all use FM Blue Accent. |
+| **Blue for interaction** | Links, focus rings, active nav indicators — all use the blue accent. |
 | **No decoration** | No icons without labels (except well-known: search, close). No ornamental borders. |
 
 ---
@@ -69,7 +69,7 @@
 ### Project Initialization Checklist
 
 - [ ] Vite + React + TypeScript template initialized
-- [ ] TailwindCSS configured with custom FM color tokens
+- [ ] TailwindCSS configured with custom color tokens
 - [ ] RDS Web Components loaded (font + stylesheet + component registration)
 - [ ] TypeScript declarations for `rds-*` custom elements created
 - [ ] ESLint + Prettier configured (strict mode)
@@ -426,7 +426,7 @@ Set up the complete project infrastructure so all future development has a solid
 |---|------|---------|
 | 1.1 | Initialize Vite project | React + TypeScript template, clean out boilerplate |
 | 1.2 | Install dependencies | tailwindcss, react-router-dom, @tanstack/react-query, axios, react-hook-form, zod, lucide-react |
-| 1.3 | Configure Tailwind | Custom colors (FM palette), font family (FM Review Web), spacing scale |
+| 1.3 | Configure Tailwind | Custom colors, font family, spacing scale |
 | 1.4 | Configure Vite for RDS | Custom element recognition, path aliases |
 | 1.5 | Create folder structure | Full `src/` tree as defined in FRONTEND_GUIDE |
 | 1.6 | RDS integration | Load font, add type declarations for all `rds-*` elements |
@@ -465,17 +465,17 @@ Build the app shell (sidebar, header, content area) that persists across all pag
 |---|------|---------|
 | 2.1 | AppShell component | Uses `<rds-app-layout>` with sidebar + main slots |
 | 2.2 | Sidebar navigation | `<rds-nav>` with role-based items (General vs Admin) |
-| 2.3 | Header | `<rds-header>` with app name "FM Essentials", user avatar |
+| 2.3 | Header | `<rds-header>` with app name "Policy Proposal Intake", user avatar |
 | 2.4 | Mobile bottom nav | 3 tabs: Dashboard, New Form, Profile |
 | 2.5 | Responsive sidebar | Full → collapsed → hidden based on breakpoint |
-| 2.6 | Active route highlighting | Current nav item highlighted with FM blue indicator |
+| 2.6 | Active route highlighting | Current nav item highlighted with a blue indicator |
 | 2.7 | Page transition | Smooth content transition on route change |
 
 ### Design Specifications
 
 ```
 ┌──────────────────────────────────────────────┐
-│  HEADER: "FM Essentials"          [Avatar]   │
+│  HEADER: "Policy Proposal Intake" [Avatar]   │
 ├────────┬─────────────────────────────────────┤
 │        │                                     │
 │  NAV   │         MAIN CONTENT                │
@@ -489,7 +489,7 @@ Build the app shell (sidebar, header, content area) that persists across all pag
 │  🏷️    │                                     │
 │        │                                     │
 ├────────┴─────────────────────────────────────┤
-│  FOOTER: © FM Global                         │
+│  FOOTER: © 2024                              │
 └──────────────────────────────────────────────┘
 ```
 
@@ -825,7 +825,7 @@ Final pass for UX polish, accessibility compliance, performance, and cross-devic
 - [ ] All form inputs have labels
 - [ ] Color contrast ratio ≥ 4.5:1
 - [ ] Focus order is logical
-- [ ] Focus indicators visible (2px solid FM blue)
+- [ ] Focus indicators visible (2px solid blue)
 - [ ] Skip-to-content link present
 - [ ] Dynamic content announced via `aria-live`
 - [ ] Modals trap focus correctly
@@ -886,16 +886,16 @@ Final pass for UX polish, accessibility compliance, performance, and cross-devic
 
 | Element | Specification |
 |---------|--------------|
-| Page title | `<rds-headline level="1">` — bold, FM Navy |
-| Section title | `<rds-headline level="2">` — semibold, FM Navy |
+| Page title | `<rds-headline level="1">` — bold, navy |
+| Section title | `<rds-headline level="2">` — semibold, navy |
 | Body text | `<rds-text size="md">` — black |
 | Helper text | `<rds-text size="sm" color="secondary">` — gray |
-| Primary button | `<rds-button variant="primary">` — FM Navy fill, white text |
-| Secondary button | `<rds-button variant="secondary">` — white fill, FM Navy border + text |
+| Primary button | `<rds-button variant="primary">` — navy fill, white text |
+| Secondary button | `<rds-button variant="secondary">` — white fill, navy border + text |
 | Danger button | `<rds-button variant="danger">` — red fill, white text (destructive only) |
 | Cards | White background, 1px border (#E0E0E5), rounded-lg, shadow-sm |
-| Table rows | Alternating: white / FM Navy Light (#F2F2F5) |
-| Active nav | Left border indicator in FM Blue Accent |
+| Table rows | Alternating: white / light navy (#F2F2F5) |
+| Active nav | Left border indicator in blue accent |
 
 ---
 

@@ -4,8 +4,8 @@
  */
 import { useState } from 'react';
 import { useEmailSubmission } from '@/hooks/useSubmissions';
-import { useNotification }    from '@/context/NotificationContext';
-import { FormModal }           from '@/components/common/FormModal';
+import { useNotification } from '@/context/NotificationContext';
+import { FormModal } from '@/components/common/FormModal';
 
 interface EmailSubmissionModalProps {
   submissionId: string;
@@ -14,8 +14,8 @@ interface EmailSubmissionModalProps {
 
 export function EmailSubmissionModal({ submissionId, onClose }: EmailSubmissionModalProps) {
   const [toEmail, setToEmail] = useState('');
-  const { mutate, isPending }  = useEmailSubmission(submissionId);
-  const { showToast }          = useNotification();
+  const { mutate, isPending } = useEmailSubmission(submissionId);
+  const { showToast } = useNotification();
 
   const handleSend = () => {
     mutate(
@@ -88,7 +88,7 @@ export function EmailSubmissionModal({ submissionId, onClose }: EmailSubmissionM
           type="email"
           value={toEmail}
           onChange={e => setToEmail(e.target.value)}
-          placeholder="e.g. colleague@fm.com"
+          placeholder="e.g. colleague@example.com"
           autoFocus
           className={[
             'w-full px-3 py-2 text-sm rounded-lg border border-[#E0E0E5]',

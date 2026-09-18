@@ -1,6 +1,6 @@
-# FM Essentials — Frontend (React) Development Guide
+# Policy Proposal Intake — Frontend (React) Development Guide
 
-> **Document Purpose:** This is the single source of truth for building the FM Essentials React UI.  
+> **Document Purpose:** This is the single source of truth for building the React UI.  
 > **Created By:** Solution Architect  
 > **Last Updated:** 2025-07  
 > **API Base URL:** `http://localhost:5000/api/v1`  
@@ -11,7 +11,7 @@
 ## 1. Problem Statement
 
 ### What exists today
-FM Essential currently relies on **multiple Word-based intake forms** that:
+The current process relies on **multiple Word-based intake forms** that:
 - Differ by **territory** (AU, US, UK, CA, SG, HK, DE, FR)
 - Require **frequent manual updates** by admins
 - Have **no version control** — users may fill outdated templates
@@ -669,7 +669,7 @@ Until SSO/JWT is implemented, the UI must send these headers with every request:
 ```typescript
 headers: {
   'X-User-Id': '00000000-0000-0000-0000-000000000001',  // Current user GUID
-  'X-User-Email': 'admin@fm.com',
+  'X-User-Email': 'admin@example.com',
   'X-User-Role': 'Admin'  // or 'General'
 }
 ```
@@ -863,11 +863,11 @@ Admin Forms page → "Create Form" button → modal
 # .env.development
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 VITE_DEFAULT_USER_ID=00000000-0000-0000-0000-000000000001
-VITE_DEFAULT_USER_EMAIL=admin@fm.com
+VITE_DEFAULT_USER_EMAIL=admin@example.com
 VITE_DEFAULT_USER_ROLE=Admin
 
 # .env.production
-VITE_API_BASE_URL=https://api.fmessentials.com/api/v1
+VITE_API_BASE_URL=https://api.example.com/api/v1
 ```
 
 ---

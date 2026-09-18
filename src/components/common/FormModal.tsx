@@ -16,8 +16,8 @@ const FOCUSABLE =
   'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 export function FormModal({ title, children, footer, size = 'md', onClose }: FormModalProps) {
-  const modalRef  = useRef<HTMLDivElement>(null);
-  const closeRef  = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   /* Auto-focus close button on open; restore focus on close */
   useEffect(() => {
@@ -47,7 +47,7 @@ export function FormModal({ title, children, footer, size = 'md', onClose }: For
       if (focusables.length === 0) return;
 
       const first = focusables[0];
-      const last  = focusables[focusables.length - 1];
+      const last = focusables[focusables.length - 1];
 
       if (e.shiftKey) {
         if (document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -59,7 +59,6 @@ export function FormModal({ title, children, footer, size = 'md', onClose }: For
   );
 
   return (
-    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       className="fm-overlay"
       role="dialog"

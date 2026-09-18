@@ -14,8 +14,8 @@ import { useEffect, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { LayoutProvider, useLayout } from '@/context/LayoutContext';
-import { TopBar }    from './TopBar';
-import { Sidebar }   from './Sidebar';
+import { TopBar } from './TopBar';
+import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { ToastContainer } from '@/components/common/ToastContainer';
 
@@ -86,10 +86,10 @@ function ShellInner({ children }: AppShellProps) {
           style={{ backgroundColor: 'var(--color-fm-navy)' }}
         >
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/20 shrink-0">
-            <span className="text-white text-xs font-bold select-none">FM</span>
+            <span className="text-white text-xs font-bold select-none">PI</span>
           </div>
           <span className="font-semibold text-sm text-white truncate">
-            FM Essentials
+            Policy Proposal Intake
           </span>
         </div>
 
@@ -141,15 +141,15 @@ import { NAV_ITEMS } from './navItems';
 function MobileSidebarNav() {
   const { isAdmin } = useAuth();
   const { closeSidebar } = useLayout();
-  const navigate   = useNavigate();
-  const location   = useRouterLocation();
+  const navigate = useNavigate();
+  const location = useRouterLocation();
 
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   const visible = NAV_ITEMS.filter(i => !i.adminOnly || isAdmin);
   const general = visible.filter(i => !i.adminOnly);
-  const admin   = visible.filter(i => i.adminOnly);
+  const admin = visible.filter(i => i.adminOnly);
 
   const go = (path: string) => { navigate(path); closeSidebar(); };
 

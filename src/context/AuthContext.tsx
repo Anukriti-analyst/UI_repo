@@ -17,16 +17,16 @@ interface AuthContextValue {
 
 const ADMIN_USER: AuthUser = {
   userId: '65CE5B0B-9B1E-4D86-A388-8BA7D8869128',
-  email: 'admin@fm.com',
+  email: 'admin@example.com',
   role: 'Admin',
-  displayName: 'FM Admin',
+  displayName: 'Administrator',
 };
 
 const GENERAL_USER: AuthUser = {
   userId: 'ABA209AE-6EE2-46B9-8939-A046C7E85DFA',
-  email: 'user@fm.com',
+  email: 'user@example.com',
   role: 'General',
-  displayName: 'FM General User',
+  displayName: 'General User',
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -62,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');

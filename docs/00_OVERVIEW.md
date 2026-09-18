@@ -1,7 +1,7 @@
-﻿# FM Essentials Intake Platform — Overview
+﻿# Policy Proposal Intake Platform — Overview
 
 ## Why this exists
-FM Essential relies on multiple intake forms tailored per territory, which creates inefficiencies in maintenance and usability. The forms are not mobile-friendly, and there is high admin effort to maintain/update them. The goal is to modernize this into a centralized configurable platform with versioning and integration readiness. (See docs/01_PROBLEM_STATEMENT.md)
+The current process relies on multiple intake forms tailored per territory, which creates inefficiencies in maintenance and usability. The forms are not mobile-friendly, and there is high admin effort to maintain/update them. The goal is to modernize this into a centralized configurable platform with versioning and integration readiness. (See docs/01_PROBLEM_STATEMENT.md)
 
 ## What we are building
 A configurable, responsive (mobile/tablet/laptop) intake platform with:

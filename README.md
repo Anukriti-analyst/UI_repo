@@ -1,4 +1,4 @@
-# FME - Policy Proposal Intake Manager
+# Policy Proposal Intake Manager
 
 A responsive web application for managing policy proposals, built with React, TypeScript, and Bootstrap.
 
@@ -22,7 +22,7 @@ A responsive web application for managing policy proposals, built with React, Ty
 ## Project Structure
 
 ```
-FMEssentials.UI/
+PolicyProposalIntake.UI/
 ├── src/
 │   ├── App.tsx              # Main application component
 │   ├── main.tsx             # Application entry point

@@ -1,6 +1,6 @@
 ﻿# Architecture
 
-See docs/FMESSENTIALS_AI_CONTEXT.md for the authoritative description.
+See docs/AI_CONTEXT.md for the authoritative description.
 
 This file can be expanded with:
 - component diagram

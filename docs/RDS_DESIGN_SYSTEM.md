@@ -26,13 +26,13 @@
 
 ## Overview
 
-RDS (Responsive Design System) is FM Global's internal design system built as **Web Components** (Custom Elements v1). Because they are framework-agnostic custom HTML elements, they can be consumed directly in any framework — including React + TypeScript + Vite projects.
+RDS (Responsive Design System) is an internal design system built as **Web Components** (Custom Elements v1). Because they are framework-agnostic custom HTML elements, they can be consumed directly in any framework — including React + TypeScript + Vite projects.
 
 Key characteristics:
 - All components are custom HTML elements prefixed with `rds-` (e.g. `<rds-button>`, `<rds-input>`)
 - Styling is driven by CSS Custom Properties (design tokens prefixed with `--rds-`)
 - Supports **light** (default) and **dark** mode via a single HTML attribute
-- Typography uses the proprietary **FM Review Web** font family
+- Typography uses a branded web font family
 - Icons use **Hero Icons** (Heroicons v2)
 - Built with Tailwind CSS utility classes internally
 
@@ -40,15 +40,15 @@ Key characteristics:
 
 ## Setup & Installation
 
-### 1. Load the FM Review Web Font
+### 1. Load the branded web font
 
 Add this `<link>` to your `index.html` `<head>`:
 
 ```html
-<link rel="stylesheet" href="https://dev2.fmglobal.com/fonts/fm-review/fm-review.css" />
+<link rel="stylesheet" href="/fonts/review/review.css" />
 ```
 
-This loads the custom FM Review Web font in weights 300, 400, 500, 700 and 900 (regular and italic).
+This loads the custom web font in weights 300, 400, 500, 700 and 900 (regular and italic).
 
 ### 2. Apply the RDS CSS Design Tokens
 
@@ -373,12 +373,12 @@ These are purpose-driven tokens that reference the primitive color tokens above.
 
 ```css
 --rds-font-family-brand:
-  'FM Review Web', ui-sans-serif, system-ui, -apple-system, blinkmacsystemfont,
+  ui-sans-serif, system-ui, -apple-system, blinkmacsystemfont,
   'Segoe UI', roboto, 'Helvetica Neue', arial, 'Noto Sans', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 ```
 
-### FM Review Web Font Weights
+### Web Font Weights
 
 | Weight | Style |
 |--------|-------|
@@ -522,7 +522,7 @@ App Layout variants:
 #### `<rds-footer>` — Footer
 ```html
 <rds-footer>
-  <span slot="copyright">© 2025 FM Global</span>
+  <span slot="copyright">© 2025</span>
 </rds-footer>
 ```
 **Variants**: default, with-confidentiality-notice, with-feedback, with-all

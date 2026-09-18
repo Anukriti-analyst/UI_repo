@@ -33,9 +33,9 @@ export function Login() {
         {/* Logo */}
         <div className="flex items-center gap-3 z-10">
           <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
-            <span className="text-white font-bold text-base">FM</span>
+            <span className="text-white font-bold text-base">PI</span>
           </div>
-          <span className="text-white font-semibold text-lg tracking-wide">FM Essentials</span>
+          <span className="text-white font-semibold text-lg tracking-wide">Policy Proposal Intake</span>
         </div>
 
         {/* Hero text */}
@@ -64,7 +64,7 @@ export function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-white/40 text-xs z-10">© 2024 FM Global. All rights reserved.</p>
+        <p className="text-white/40 text-xs z-10">© 2024. All rights reserved.</p>
       </div>
 
       {/* Right panel — login */}
@@ -73,9 +73,9 @@ export function Login() {
           {/* Mobile logo */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 shadow-lg" style={{ background: 'linear-gradient(135deg, #0057CA, #0073E6)' }}>
-              <span className="text-white font-bold text-xl">FM</span>
+              <span className="text-white font-bold text-xl">PI</span>
             </div>
-            <h1 className="text-xl font-bold" style={{ color: '#0D102B' }}>FM Essentials</h1>
+            <h1 className="text-xl font-bold" style={{ color: '#0D102B' }}>Policy Proposal Intake</h1>
           </div>
 
           {/* Card */}
@@ -174,7 +174,7 @@ export function Login() {
 
           {/* Bottom note */}
           <p className="text-xs text-center mt-5" style={{ color: '#999' }}>
-            FM Global · Secure Internal Platform
+            Secure Internal Platform
           </p>
         </div>
       </div>

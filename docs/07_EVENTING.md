@@ -15,7 +15,7 @@
   - idempotency key = (eventId or upstream version)
 
 ## Outbound events (topics)
-- Topic: fmessentials.submissions
+- Topic: policy-proposal.submissions
 - Events:
   - SubmissionCreated
   - SubmissionUpdated

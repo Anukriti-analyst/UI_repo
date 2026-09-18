@@ -1,8 +1,8 @@
-# FM Essential Intake Platform – Solution Design Document
+# Policy Proposal Intake Platform – Solution Design Document
 
 ## 1. Problem Statement
 
-FM Essential currently relies on **multiple Word-based intake forms** that:
+The current process relies on **multiple Word-based intake forms** that:
 - Differ by **territory**
 - Require **frequent manual updates**
 - Lack **version control and auditability**
@@ -15,13 +15,13 @@ This leads to:
 - Risk of users filling outdated templates
 - Poor experience for brokers and underwriters working remotely
 
-The challenge is to **modernize the intake mechanism** into a **centralized, configurable, responsive, and version‑controlled platform** that can scale across regions and integrate with downstream systems such as **GBS / GPM**. [2](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/Shared%20Documents/General/Hackathon%202.0/Problem%20Statements%20+%20Artifacts/Problem%20Statement%203_FM%20Essentials/Solution%20requirement%20document%20For%20Participants%20%20Add%20column/Hackathon%202.0-%20PS3%20-%20FM%20essential%20Intake.pdf?web=1)
+The challenge is to **modernize the intake mechanism** into a **centralized, configurable, responsive, and version‑controlled platform** that can scale across regions and integrate with downstream systems such as **GBS / GPM**.
 
 ---
 
 ## 2. Proposed Solution (High‑Level)
 
-We propose a **web‑based FM Essential Intake Platform** that provides:
+We propose a **web‑based Policy Proposal Intake Platform** that provides:
 
 - **Configurable Form Engine**
 - **Role‑based Admin & General User experiences**
@@ -31,7 +31,7 @@ We propose a **web‑based FM Essential Intake Platform** that provides:
 - **Event‑driven integration using Event Grid**
 - **Centralized data storage with integration‑ready APIs**
 
-This solution eliminates manual Word documents and enables **future‑proof extensibility**. [3](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/_layouts/15/Doc.aspx?sourcedoc=%7BB0761E8B-E65D-41F6-BF13-C8857CC0FAA1%7D&file=Hackathon%202.0-%20PS3%20-%20FM%20essential%20Intake.docx&action=default&mobileredirect=true&DefaultItemOpen=1)
+This solution eliminates manual Word documents and enables **future‑proof extensibility**.
 
 ---
 
@@ -84,7 +84,7 @@ Admin users can:
 - View **all versions**
 - Activate / deactivate versions
 
-Versioning is mandatory and immutable once published. [2](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/Shared%20Documents/General/Hackathon%202.0/Problem%20Statements%20+%20Artifacts/Problem%20Statement%203_FM%20Essentials/Solution%20requirement%20document%20For%20Participants%20%20Add%20column/Hackathon%202.0-%20PS3%20-%20FM%20essential%20Intake.pdf?web=1)
+Versioning is mandatory and immutable once published.
 
 ---
 
@@ -100,7 +100,7 @@ General users can:
   - Open the saved form
   - View it in the **exact version** used
 - Download form as **PDF**
-- Email form to **FM Essentials support mailbox**
+- Email form to the **support mailbox**
 - Fill a **New Form** using a **Wizard Flow**
   - Select form
   - Complete sections step‑by‑step
@@ -228,7 +228,7 @@ All entities are normalized to **3NF** and indexed on:
 - SubmissionUpdated
 - VersionActivated
 
-Events are published with **topics**, enabling any downstream system to subscribe. [1](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/_layouts/15/Doc.aspx?sourcedoc=%7B53F1F1B3-C6A0-4673-993A-1578CB363FF5%7D&file=Meeting%20Notes.docx&action=default&mobileredirect=true&DefaultItemOpen=1)
+Events are published with **topics**, enabling any downstream system to subscribe.
 
 ---
 
@@ -278,10 +278,10 @@ apiClient
 ✅ Integration‑ready APIs  
 ✅ Event‑driven architecture  
 
-All requirements from the problem statement and stakeholder discussions are fully addressed. [2](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/Shared%20Documents/General/Hackathon%202.0/Problem%20Statements%20+%20Artifacts/Problem%20Statement%203_FM%20Essentials/Solution%20requirement%20document%20For%20Participants%20%20Add%20column/Hackathon%202.0-%20PS3%20-%20FM%20essential%20Intake.pdf?web=1)[3](https://fmglobal.sharepoint.com/teams/FMIndiaTeam/_layouts/15/Doc.aspx?sourcedoc=%7BB0761E8B-E65D-41F6-BF13-C8857CC0FAA1%7D&file=Hackathon%202.0-%20PS3%20-%20FM%20essential%20Intake.docx&action=default&mobileredirect=true&DefaultItemOpen=1)
+All requirements from the problem statement and stakeholder discussions are fully addressed.
 
 ---
 
 ## 13. Conclusion
 
-This solution **modernizes FM Essential Intake** into a **scalable, governed, user‑friendly, and future‑ready platform**, significantly reducing manual effort while improving accuracy, usability, and integration readiness.
+This solution **modernizes the intake process** into a **scalable, governed, user‑friendly, and future‑ready platform**, significantly reducing manual effort while improving accuracy, usability, and integration readiness.

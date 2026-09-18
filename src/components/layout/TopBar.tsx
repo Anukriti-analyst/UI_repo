@@ -1,5 +1,5 @@
 /**
- * TopBar — FM-branded application header.
+ * TopBar — application header.
  * Shows app name, hamburger (mobile only), and user avatar/initials.
  */
 import { useAuth } from '@/context/AuthContext';
@@ -58,7 +58,7 @@ export function TopBar() {
           className="text-base font-semibold truncate"
           style={{ color: 'var(--color-fm-navy)' }}
         >
-          FM Essentials
+          Policy Proposal Intake Manager
         </span>
       </div>
 

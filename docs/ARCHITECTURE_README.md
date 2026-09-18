@@ -1,4 +1,4 @@
-# FMEssentials Solution Structure
+# Policy Proposal Intake Solution Structure
 
 This solution follows **Clean Architecture** principles with clear separation of concerns.
 
@@ -6,20 +6,20 @@ This solution follows **Clean Architecture** principles with clear separation of
 
 ```
 C:\Hackathon\
-├── FMEssentials.API\          # API/Presentation Layer
+├── PolicyProposal.API\          # API/Presentation Layer
 │   ├── Program.cs             # Application entry point
 │   ├── appsettings.json       # Configuration
 │   └── Controllers\           # API Controllers (to be added)
 │
-├── FMEssentials.Application\  # Application Layer
+├── PolicyProposal.Application\  # Application Layer
 │   ├── Interfaces\            # Repository and service interfaces
 │   └── Services\              # Business logic services (to be added)
 │
-├── FMEssentials.Domain\       # Domain Layer
+├── PolicyProposal.Domain\       # Domain Layer
 │   ├── Entities\              # Domain entities
 │   └── Enums\                 # Domain enumerations
 │
-└── FMEssentials.Infrastructure\ # Infrastructure Layer
+└── PolicyProposal.Infrastructure\ # Infrastructure Layer
     ├── Data\                  # DbContext and configurations (to be added)
     ├── Repositories\          # Repository implementations (to be added)
     └── Services\              # External service implementations (to be added)
@@ -44,7 +44,7 @@ Following Clean Architecture dependency rules:
 ## Build Order
 
 The projects build in this order:
-1. FMEssentials.Domain
-2. FMEssentials.Application
-3. FMEssentials.Infrastructure
-4. FMEssentials.API
+1. PolicyProposal.Domain
+2. PolicyProposal.Application
+3. PolicyProposal.Infrastructure
+4. PolicyProposal.API

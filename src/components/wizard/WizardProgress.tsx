@@ -31,7 +31,7 @@ function getClipPath(i: number, total: number): string {
 }
 
 function getBg(step: Step): string {
-  if (step.isActive)   return '#383B54'; // FM navy
+  if (step.isActive) return '#383B54'; // primary navy
   if (step.isComplete) return '#565A7E'; // lighter navy
   return '#E4E6F0';                       // pale lavender-gray
 }
@@ -81,12 +81,12 @@ export function WizardProgress({ steps, currentIndex }: WizardProgressProps) {
             aria-current={step.isActive ? 'step' : undefined}
             title={step.label}
             style={{
-              clipPath:        getClipPath(i, total),
+              clipPath: getClipPath(i, total),
               backgroundColor: getBg(step),
-              marginLeft:      i === 0 ? 0 : `-${NOTCH}px`,
-              zIndex:          step.isActive ? total + 2 : total - i,
-              transition:      'background-color 0.3s ease',
-              minWidth:        `${100 + NOTCH}px`,
+              marginLeft: i === 0 ? 0 : `-${NOTCH}px`,
+              zIndex: step.isActive ? total + 2 : total - i,
+              transition: 'background-color 0.3s ease',
+              minWidth: `${100 + NOTCH}px`,
             }}
             className="relative flex-1 h-14 flex items-center justify-center cursor-default select-none"
           >
@@ -94,19 +94,19 @@ export function WizardProgress({ steps, currentIndex }: WizardProgressProps) {
             <div
               className="flex flex-col items-center justify-center text-center w-full"
               style={{
-                paddingLeft:  i === 0              ? '14px' : `${NOTCH + 10}px`,
-                paddingRight: i === total - 1      ? '14px' : `${NOTCH + 10}px`,
-                color:        getTextColor(step),
+                paddingLeft: i === 0 ? '14px' : `${NOTCH + 10}px`,
+                paddingRight: i === total - 1 ? '14px' : `${NOTCH + 10}px`,
+                color: getTextColor(step),
               }}
             >
-            {/* Section label only */}
+              {/* Section label only */}
               <span
                 className="text-[11px] font-semibold leading-tight"
                 style={{
-                  display:            '-webkit-box',
-                  WebkitLineClamp:    2,
-                  WebkitBoxOrient:    'vertical',
-                  overflow:           'hidden',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
                 }}
               >
                 {step.label}

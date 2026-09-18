@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useWatch, type Control, type FieldValues, type Path } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
@@ -13,7 +13,7 @@ import { DateInput } from '@/components/fields/DateInput';
 
 const YES_NO_OPTIONS = [
   { value: 'Yes', label: 'Yes' },
-  { value: 'No',  label: 'No' },
+  { value: 'No', label: 'No' },
 ];
 
 interface QuestionRendererProps<T extends FieldValues> {
@@ -237,7 +237,7 @@ function ConditionalSubQuestion<T extends FieldValues>({
   subIndex,
 }: SubQuestionProps<T>) {
   const parentValue = useWatch({ control, name: parentFieldName });
-  const [visible, setVisible] = useState(false);
+  const visible = String(parentValue ?? '').toLowerCase() === subQuestion.triggerValue.toLowerCase();
 
   /* All hooks MUST be above any early return */
   const resolvedOptions = useMemo(() => {
@@ -247,11 +247,6 @@ function ConditionalSubQuestion<T extends FieldValues>({
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map((o) => ({ value: o.optionValue, label: o.optionText }));
   }, [subQuestion.options]);
-
-  useEffect(() => {
-    const matches = String(parentValue ?? '').toLowerCase() === subQuestion.triggerValue.toLowerCase();
-    setVisible(matches);
-  }, [parentValue, subQuestion.triggerValue]);
 
   if (!visible) return null;
 
@@ -288,11 +283,11 @@ function ConditionalSubQuestion<T extends FieldValues>({
             case 'MultiSelect':
               return resolvedOptions.length > 0
                 ? <CheckboxGroupInput
-                    {...common}
-                    value={common.value ? common.value.split(',') : []}
-                    onChange={(vals) => field.onChange(vals.join(','))}
-                    options={resolvedOptions}
-                  />
+                  {...common}
+                  value={common.value ? common.value.split(',') : []}
+                  onChange={(vals) => field.onChange(vals.join(','))}
+                  options={resolvedOptions}
+                />
                 : <TextInput {...common} />;
             case 'Text':
             default:

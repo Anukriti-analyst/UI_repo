@@ -17,7 +17,7 @@ export function Sidebar() {
 
   /* Separate general and admin groups */
   const generalItems = visibleItems.filter(i => !i.adminOnly);
-  const adminItems   = visibleItems.filter(i => i.adminOnly);
+  const adminItems = visibleItems.filter(i => i.adminOnly);
 
   return (
     <>
@@ -51,7 +51,7 @@ export function Sidebar() {
               className="font-semibold text-sm leading-tight truncate"
               style={{ color: 'var(--color-fm-navy)' }}
             >
-              FM Essentials
+              Policy Proposal Intake
             </span>
           )}
         </div>

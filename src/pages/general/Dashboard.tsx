@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { PageHeading }     from '@/components/common/PageHeading';
-import { DataTable }       from '@/components/common/DataTable';
-import { StatusBadge }     from '@/components/common/StatusBadge';
-import { SkeletonLoader }  from '@/components/common/SkeletonLoader';
-import { ErrorState }      from '@/components/common/ErrorState';
-import { SubmissionCard }  from '@/components/common/SubmissionCard';
-import { useSubmissions }  from '@/hooks/useSubmissions';
-import { usePageTitle }    from '@/hooks/usePageTitle';
-import { formatDate }      from '@/utils/formatDate';
-import type { Column }     from '@/components/common/DataTable';
+import { PageHeading } from '@/components/common/PageHeading';
+import { DataTable } from '@/components/common/DataTable';
+import { StatusBadge } from '@/components/common/StatusBadge';
+import { SkeletonLoader } from '@/components/common/SkeletonLoader';
+import { ErrorState } from '@/components/common/ErrorState';
+import { SubmissionCard } from '@/components/common/SubmissionCard';
+import { useSubmissions } from '@/hooks/useSubmissions';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { formatDate } from '@/utils/formatDate';
+import type { Column } from '@/components/common/DataTable';
 import type { SubmissionSummaryDto } from '@/api/types/submission.types';
 
 /* ── Table column definitions ─────────────────────────────────── */
@@ -124,24 +124,24 @@ export function Dashboard() {
   usePageTitle('Dashboard');
 
   /* ── Filter state ─────────────────────────────────────────────── */
-  const [filterStatus,    setFilterStatus]    = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [filterTerritory, setFilterTerritory] = useState('');
-  const [filterForm,      setFilterForm]      = useState('');
+  const [filterForm, setFilterForm] = useState('');
 
   const goToNew = () => navigate('/submissions/new');
 
   const submissions = data ?? [];
 
   /* ── Derive unique filter options from data ───────────────────── */
-  const statusOptions    = [...new Set(submissions.map((s) => s.status))].sort();
+  const statusOptions = [...new Set(submissions.map((s) => s.status))].sort();
   const territoryOptions = [...new Set(submissions.map((s) => s.territoryName).filter(Boolean))].sort();
-  const formOptions      = [...new Set(submissions.map((s) => s.formName).filter(Boolean))].sort();
+  const formOptions = [...new Set(submissions.map((s) => s.formName).filter(Boolean))].sort();
 
   /* ── Apply filters ────────────────────────────────────────────── */
   const filtered = useMemo(() => submissions.filter((s) => {
-    if (filterStatus    && s.status        !== filterStatus)    return false;
+    if (filterStatus && s.status !== filterStatus) return false;
     if (filterTerritory && s.territoryName !== filterTerritory) return false;
-    if (filterForm      && s.formName      !== filterForm)      return false;
+    if (filterForm && s.formName !== filterForm) return false;
     return true;
   }), [submissions, filterStatus, filterTerritory, filterForm]);
 
@@ -176,7 +176,7 @@ export function Dashboard() {
       <div>
         <PageHeading
           title="Dashboard"
-          subtitle="Your FM Essentials submissions"
+          subtitle="Your policy proposal submissions"
           actions={actions}
         />
         <div className="fm-card">
@@ -192,7 +192,7 @@ export function Dashboard() {
       <div>
         <PageHeading
           title="Dashboard"
-          subtitle="Your FM Essentials submissions"
+          subtitle="Your policy proposal submissions"
           actions={actions}
         />
         <ErrorState
@@ -207,7 +207,7 @@ export function Dashboard() {
     <div>
       <PageHeading
         title="Dashboard"
-        subtitle="Your FM Essentials submissions"
+        subtitle="Your policy proposal submissions"
         actions={actions}
       />
 

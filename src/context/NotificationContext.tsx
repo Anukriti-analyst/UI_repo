@@ -54,6 +54,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useNotification(): NotificationContextValue {
   const ctx = useContext(NotificationContext);
   if (!ctx) throw new Error('useNotification must be used within <NotificationProvider>');

@@ -22,7 +22,7 @@ Admin can:
 General can:
 - view dashboard with forms they filled (draft/submitted) and key metadata
 - open any submission (from dashboard row hyperlink) and see all details for that submission regardless of the current active form version
-- download as PDF or email to FM Essentials support mailbox
+- download as PDF or email to the support mailbox
 - start “Fill New Form” wizard:
   - choose which form to fill
   - complete wizard sections (responsive UX)

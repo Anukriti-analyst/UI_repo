@@ -20,7 +20,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
       value={{
         sidebarOpen,
         toggleSidebar: () => setSidebarOpen(p => !p),
-        closeSidebar:  () => setSidebarOpen(false),
+        closeSidebar: () => setSidebarOpen(false),
       }}
     >
       {children}
@@ -28,6 +28,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLayout(): LayoutContextValue {
   const ctx = useContext(LayoutContext);
   if (!ctx) throw new Error('useLayout must be used within <LayoutProvider>');

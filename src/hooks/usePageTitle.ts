@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 
-const APP_NAME = 'FM Essentials';
+const APP_NAME = 'Policy Proposal Intake Manager';
 
 /**
- * Sets document.title to "<pageTitle> | FM Essentials".
- * Resets to just "FM Essentials" on unmount.
+ * Sets the document title for the current page.
+ * Resets to the application name on unmount.
  */
 export function usePageTitle(pageTitle: string) {
   useEffect(() => {

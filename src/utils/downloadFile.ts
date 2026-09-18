@@ -3,9 +3,9 @@
  * Used for PDF export.
  */
 export function downloadFile(blob: Blob, filename: string): void {
-  const url  = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href  = url;
+  link.href = url;
   link.download = filename;
   document.body.appendChild(link);
   link.click();
@@ -16,5 +16,5 @@ export function downloadFile(blob: Blob, filename: string): void {
 /** Generates a sanitised filename for a submission PDF */
 export function submissionPdfFilename(formName: string, referenceNumber: string | null): string {
   const base = referenceNumber ?? formName.replace(/\s+/g, '-').toLowerCase();
-  return `fm-essentials-${base}.pdf`;
+  return `policy-proposal-${base}.pdf`;
 }
