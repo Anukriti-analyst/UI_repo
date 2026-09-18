@@ -42,44 +42,43 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # sonarqube:
-  #   name: SonarQube
-  #   needs: lint
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'push' || github.event.pull_request.merged == true
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #
-  #     - name: Run SonarQube scan
-  #       if: vars.SONAR_HOST_URL != '' && secrets.SONAR_TOKEN != ''
-  #       uses: SonarSource/sonarqube-scan-action@v6
-  #       with:
-  #         args: >-
-  #           -Dsonar.projectKey=fme-policy-proposal-intake-manager
-  #           -Dsonar.sources=src
-  #           -Dsonar.exclusions=dist/**,node_modules/**
-  #       env:
-  #         SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #
-  #     - name: Report missing SonarQube configuration
-  #       if: vars.SONAR_HOST_URL == '' || secrets.SONAR_TOKEN == ''
-  #       run: echo "::warning::SonarQube scan skipped because configuration is missing."
-  #
-  #     - name: Publish SonarQube report artifact
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: sonar-report
-  #         path: .scannerwork/**
-  #         if-no-files-found: ignore
-  #         retention-days: 7
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run SonarQube scan
+        if: vars.SONAR_HOST_URL != '' && secrets.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: >-
+            -Dsonar.projectKey=fme-policy-proposal-intake-manager
+            -Dsonar.sources=src
+            -Dsonar.exclusions=dist/**,node_modules/**
+        env:
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Report missing SonarQube configuration
+        if: vars.SONAR_HOST_URL == '' || secrets.SONAR_TOKEN == ''
+        run: echo "::warning::SonarQube scan skipped because configuration is missing."
+
+      - name: Publish SonarQube report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-report
+          path: .scannerwork/**
+          if-no-files-found: ignore
+          retention-days: 7
 
   ci:
     name: Build
-    needs: lint
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     env:
@@ -113,66 +112,59 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # veracode:
-  #   name: Veracode
-  #   needs: ci
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'push' || github.event.pull_request.merged == true
-  #   continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
-  #   env:
-  #     VERACODE_API_ID: ${{ secrets.VERACODE_API_ID || '' }}
-  #     VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY || '' }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: build-artifacts
-  #         path: release
-  #
-  #     - name: Package application for Veracode scan
-  #       if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
-  #       run: zip -r veracode-source.zip release
-  #
-  #     - name: Run Veracode scan
-  #       if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
-  #       uses: veracode/Veracode-pipeline-scan-action@v1.0.20
-  #       with:
-  #         vid: ${{ env.VERACODE_API_ID }}
-  #         vkey: ${{ env.VERACODE_API_KEY }}
-  #         file: veracode-source.zip
-  #         fail_build: true
-  #
-  #     - name: Skip Veracode when not configured
-  #       if: env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == ''
-  #       run: echo "::warning::Veracode scan skipped because credentials are missing."
-  #
-  #     - name: Block main branch when Veracode is not configured
-  #       if: github.event_name == 'pull_request' && github.base_ref == 'main' && (env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == '')
-  #       run: exit 1
-  #
-  #     - name: Publish Veracode report artifact
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: veracode-report
-  #         path: |
-  #           veracode-source.zip
-  #           results*.json
-  #         if-no-files-found: ignore
-  #         retention-days: 7
+  veracode:
+    name: Veracode
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    continue-on-error: ${{ !(github.event_name == 'pull_request' && github.base_ref == 'main') }}
+    env:
+      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID || '' }}
+      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY || '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  cd:
-    name: Deploy
+      - name: Package application for Veracode scan
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        run: zip -r veracode-source.zip . -x '.git/*' 'node_modules/*' 'dist/*'
+
+      - name: Run Veracode scan
+        if: env.VERACODE_API_ID != '' && env.VERACODE_API_KEY != ''
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+        with:
+          vid: ${{ env.VERACODE_API_ID }}
+          vkey: ${{ env.VERACODE_API_KEY }}
+          file: veracode-source.zip
+          fail_build: true
+
+      - name: Skip Veracode when not configured
+        if: env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == ''
+        run: echo "::warning::Veracode scan skipped because credentials are missing."
+
+      - name: Block main branch when Veracode is not configured
+        if: github.event_name == 'pull_request' && github.base_ref == 'main' && (env.VERACODE_API_ID == '' || env.VERACODE_API_KEY == '')
+        run: exit 1
+
+      - name: Publish Veracode report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: veracode-report
+          path: |
+            veracode-source.zip
+            results*.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  deploy-dev:
+    name: Deploy to Dev
     needs: [ci]
     if: >-
-      always() &&
       needs.ci.result == 'success' &&
-      ((github.event_name == 'push' && startsWith(github.ref, 'refs/tags/release-')) ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true &&
-      (github.base_ref == 'develop' || startsWith(github.base_ref, 'release/') || github.base_ref == 'main')))
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/tags/release-')
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -180,10 +172,75 @@ jobs:
           name: build-artifacts
           path: release
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Dev
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           slot-name: ${{ vars.AZURE_WEBAPP_SLOT_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: release
+
+  deploy-qa:
+    name: Deploy to QA
+    needs: [deploy-dev]
+    if: needs.deploy-dev.result == 'success'
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: release
+
+      - name: Deploy to QA
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ vars.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-uat:
+    name: Deploy to UAT
+    needs: [deploy-qa]
+    if: needs.deploy-qa.result == 'success'
+    runs-on: ubuntu-latest
+    environment: uat
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: release
+
+      - name: Deploy to UAT
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ vars.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: [deploy-uat]
+    if: needs.deploy-uat.result == 'success'
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: release
+
+      - name: Deploy to Production
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ vars.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+
