@@ -46,6 +46,8 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.pull_request.merged == true
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN || '' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -53,7 +55,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run SonarQube scan
-        if: vars.SONAR_HOST_URL != '' && secrets.SONAR_TOKEN != ''
+        if: vars.SONAR_HOST_URL != '' && env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >-
@@ -65,7 +67,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Report missing SonarQube configuration
-        if: vars.SONAR_HOST_URL == '' || secrets.SONAR_TOKEN == ''
+        if: vars.SONAR_HOST_URL == '' || env.SONAR_TOKEN == ''
         run: echo "::warning::SonarQube scan skipped because configuration is missing."
 
       - name: Publish SonarQube report artifact
@@ -79,6 +81,7 @@ jobs:
 
   ci:
     name: Build
+    needs: [lint]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     env:
@@ -164,7 +167,6 @@ jobs:
       github.event_name == 'push' &&
       startsWith(github.ref, 'refs/tags/release-')
     runs-on: ubuntu-latest
-    environment: dev
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -180,12 +182,40 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: release
 
+  # ##################### GitHub Environments #####################
+  #
+  # A GitHub Environment represents a deployment target such as QA, UAT, or PROD.
+  # Environments allow deployment-specific controls and configuration to be kept
+  # separate from the application source code and from other environments.
+  #
+  # Configure each environment from:
+  # Repository Settings > Environments > QA, UAT, or PROD.
+  #
+  # Recommended configuration for QA, UAT, and PROD:
+  # 1. Enable Required reviewers and add the approved reviewer or team.
+  # 2. Enable Prevent self-review when the approver must be different from the
+  #    person who started the workflow.
+  # 3. Configure Deployment branches and tags to restrict which refs may deploy.
+  # 4. Add environment secrets, such as AZURE_WEBAPP_PUBLISH_PROFILE, when the
+  #    value must be encrypted and must only be available during that deployment.
+  # 5. Add environment variables, such as AZURE_WEBAPP_NAME or API URLs, when the
+  #    value is non-sensitive and differs between QA, UAT, and PROD.
+  # 6. Optionally configure a wait timer or additional deployment protection rules.
+  # 7. Save the protection rules before running the workflow.
+  #
+  # When a job references an environment, GitHub pauses the job before deployment
+  # until its protection rules are satisfied. Environment secrets are only exposed
+  # after approval, which reduces accidental deployments and protects credentials.
+  # This also provides an approval audit trail, controlled promotion, and clear
+  # separation of QA, UAT, and PROD configuration. Dev remains automatic here.
+  #
+  # ##################### End GitHub Environments #####################
   deploy-qa:
     name: Deploy to QA
     needs: [deploy-dev]
     if: needs.deploy-dev.result == 'success'
     runs-on: ubuntu-latest
-    environment: qa
+    environment: QA
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -206,7 +236,7 @@ jobs:
     needs: [deploy-qa]
     if: needs.deploy-qa.result == 'success'
     runs-on: ubuntu-latest
-    environment: uat
+    environment: UAT
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -227,7 +257,7 @@ jobs:
     needs: [deploy-uat]
     if: needs.deploy-uat.result == 'success'
     runs-on: ubuntu-latest
-    environment: prod
+    environment: PROD
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
