@@ -1,0 +1,124 @@
+name: UI Azure CD Template
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy feature branch to Dev
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.base_ref == 'develop' &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: dev
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy Dev package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-qa:
+    name: Deploy release branch to QA
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      startsWith(github.base_ref, 'release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: qa
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy QA package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-uat:
+    name: Deploy release tag to UAT
+    if: >-
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/tags/release-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: uat
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy UAT package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
+
+  deploy-prod:
+    name: Deploy main to Prod
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: prod
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || '' }}
+      AZURE_WEBAPP_SLOT_NAME: ${{ vars.AZURE_WEBAPP_SLOT_NAME || '' }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || '' }}
+    steps:
+      - name: Download verified artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist-${{ github.sha }}
+          path: release
+
+      - name: Deploy Prod package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_WEBAPP_SLOT_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release
